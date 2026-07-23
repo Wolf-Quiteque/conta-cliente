@@ -15,11 +15,11 @@ pendentes até serem aprovadas no painel de administração (`conta-admin`).
 ## Configuração
 
 1. Copie `.env.example` para `.env.local` e preencha:
-   - `DATABASE_URL` — connection string do Neon (Vercel → Storage → Neon).
+   - `DATABASE_URL_UNPOOLED` — connection string do Neon (Vercel → Storage → Neon).
    - `BLOB_READ_WRITE_TOKEN` — token do Vercel Blob (Vercel → Storage → Blob).
    - `SESSION_SECRET` — gerar com `openssl rand -base64 32`.
 
-   **Importante:** `DATABASE_URL` e `BLOB_READ_WRITE_TOKEN` devem ser os
+   **Importante:** `DATABASE_URL_UNPOOLED` e `BLOB_READ_WRITE_TOKEN` devem ser os
    mesmos usados no projeto `conta-admin`, porque ambas as apps partilham a
    mesma base de dados e o mesmo espaço de armazenamento.
 
