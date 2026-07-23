@@ -1,36 +1,61 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# NAWA Contas — Cliente
 
-## Getting Started
+App mobile-first onde os clientes fotografam e enviam os seus recibos (com
+valor e data opcionais quando a foto sai pouco nítida). As contas ficam
+pendentes até serem aprovadas no painel de administração (`conta-admin`).
 
-First, run the development server:
+## Stack
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- Next.js 16 (App Router, Server Actions, Proxy)
+- Neon Postgres + Drizzle ORM
+- Vercel Blob (upload direto do browser, com conversão para WebP no cliente)
+- Tailwind CSS v4
+- Sessões com cookie assinado (JWT via `jose`)
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Configuração
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Copie `.env.example` para `.env.local` e preencha:
+   - `DATABASE_URL` — connection string do Neon (Vercel → Storage → Neon).
+   - `BLOB_READ_WRITE_TOKEN` — token do Vercel Blob (Vercel → Storage → Blob).
+   - `SESSION_SECRET` — gerar com `openssl rand -base64 32`.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+   **Importante:** `DATABASE_URL` e `BLOB_READ_WRITE_TOKEN` devem ser os
+   mesmos usados no projeto `conta-admin`, porque ambas as apps partilham a
+   mesma base de dados e o mesmo espaço de armazenamento.
 
-## Learn More
+2. Instale as dependências:
 
-To learn more about Next.js, take a look at the following resources:
+   ```bash
+   npm install
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+3. Crie as tabelas na base de dados (basta correr uma vez, a partir de
+   qualquer um dos dois projetos, já que partilham o schema):
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+   ```bash
+   npm run db:push
+   ```
 
-## Deploy on Vercel
+4. Crie o primeiro administrador — ver README do `conta-admin`
+   (`npm run seed:admin`).
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+5. Arranque em desenvolvimento:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+   ```bash
+   npm run dev
+   ```
+
+## Fluxo
+
+1. O cliente regista-se (`/registar`) e fica com estado **pendente**.
+2. Um administrador aprova a conta em `conta-admin`.
+3. Só depois de **aprovado** o cliente consegue enviar recibos em `/recibos`.
+4. Cada envio: foto é redimensionada e convertida para WebP no browser,
+   enviada diretamente para o Vercel Blob, e o registo (valor/data/nota) é
+   guardado na base de dados.
+
+## Deploy
+
+Faça deploy como um projeto Vercel normal, com as três variáveis de ambiente
+acima configuradas em Production/Preview. Recomenda-se ligar o mesmo recurso
+Neon e o mesmo Blob Store usados pelo `conta-admin`.
