@@ -1,5 +1,5 @@
 {
-  "id": "8d340e77-0944-4869-a37a-bcd2a78c6d5c",
+  "id": "e8775c0e-0719-40a2-adbc-7ae50cdaaf23",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -83,6 +83,20 @@
         "company_id": {
           "name": "company_id",
           "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "type": {
+          "name": "type",
+          "type": "receipt_type",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "payment_method": {
+          "name": "payment_method",
+          "type": "payment_method",
+          "typeSchema": "public",
           "primaryKey": false,
           "notNull": true
         },
@@ -271,6 +285,22 @@
         "pendente",
         "aprovado",
         "rejeitado"
+      ]
+    },
+    "public.payment_method": {
+      "name": "payment_method",
+      "schema": "public",
+      "values": [
+        "dinheiro",
+        "banco"
+      ]
+    },
+    "public.receipt_type": {
+      "name": "receipt_type",
+      "schema": "public",
+      "values": [
+        "venda",
+        "compra"
       ]
     },
     "public.user_role": {

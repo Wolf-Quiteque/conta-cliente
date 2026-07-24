@@ -9,6 +9,8 @@ import { verifySession } from "@/lib/auth/dal";
 export type CreateReceiptInput = {
   imageUrl: string;
   imagePathname: string;
+  type: "venda" | "compra";
+  paymentMethod: "dinheiro" | "banco";
   amount: string | null;
   date: string | null;
   note: string | null;
@@ -16,6 +18,13 @@ export type CreateReceiptInput = {
 
 export async function createReceipt(input: CreateReceiptInput) {
   const session = await verifySession();
+
+  if (input.type !== "venda" && input.type !== "compra") {
+    throw new Error("Tipo de recibo inválido.");
+  }
+  if (input.paymentMethod !== "dinheiro" && input.paymentMethod !== "banco") {
+    throw new Error("Forma de pagamento inválida.");
+  }
 
   const [row] = await db
     .select({ companyId: users.companyId, companyStatus: companies.status })
@@ -31,6 +40,8 @@ export async function createReceipt(input: CreateReceiptInput) {
   await db.insert(receipts).values({
     userId: session.userId,
     companyId: row.companyId!,
+    type: input.type,
+    paymentMethod: input.paymentMethod,
     imageUrl: input.imageUrl,
     imagePathname: input.imagePathname,
     amount: input.amount,

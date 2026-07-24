@@ -1,6 +1,8 @@
-import { handleUpload, type HandleUploadBody } from "@vercel/blob/client";
+import { put } from "@vercel/blob";
 import { NextResponse } from "next/server";
 import { getOptionalSession } from "@/lib/auth/dal";
+
+const MAX_SIZE_BYTES = 15 * 1024 * 1024;
 
 export async function POST(request: Request): Promise<NextResponse> {
   const session = await getOptionalSession();
@@ -8,28 +10,28 @@ export async function POST(request: Request): Promise<NextResponse> {
     return NextResponse.json({ error: "Não autenticado." }, { status: 401 });
   }
 
-  const body = (await request.json()) as HandleUploadBody;
+  const formData = await request.formData();
+  const file = formData.get("file");
+
+  if (!(file instanceof File)) {
+    return NextResponse.json({ error: "Ficheiro em falta." }, { status: 400 });
+  }
+
+  if (file.size > MAX_SIZE_BYTES) {
+    return NextResponse.json(
+      { error: "A imagem é demasiado grande." },
+      { status: 400 },
+    );
+  }
 
   try {
-    const jsonResponse = await handleUpload({
-      body,
-      request,
-      onBeforeGenerateToken: async () => {
-        return {
-          allowedContentTypes: ["image/webp", "image/jpeg", "image/png"],
-          addRandomSuffix: true,
-          maximumSizeInBytes: 15 * 1024 * 1024,
-          tokenPayload: JSON.stringify({ userId: session.userId }),
-        };
-      },
-      onUploadCompleted: async () => {
-        // The receipt record is created explicitly by the client after upload
-        // (via createReceipt), so the user's entered date/amount are captured
-        // in the same step. Nothing to do here.
-      },
+    const blob = await put(`recibos/${Date.now()}-${file.name}`, file, {
+      access: "public",
+      addRandomSuffix: true,
+      contentType: file.type || "image/webp",
     });
 
-    return NextResponse.json(jsonResponse);
+    return NextResponse.json({ url: blob.url, pathname: blob.pathname });
   } catch (error) {
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Erro no upload." },

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { clsx } from "clsx";
 import { desc, eq } from "drizzle-orm";
 import { Plus, ReceiptText, TriangleAlert } from "lucide-react";
 import { db } from "@/lib/db/client";
@@ -21,6 +22,8 @@ export default async function RecibosPage() {
       receiptDate: receipts.receiptDate,
       note: receipts.note,
       createdAt: receipts.createdAt,
+      type: receipts.type,
+      paymentMethod: receipts.paymentMethod,
       uploaderId: users.id,
       uploaderName: users.name,
     })
@@ -30,10 +33,16 @@ export default async function RecibosPage() {
     .orderBy(desc(receipts.createdAt));
 
   const canUpload = user.companyStatus === "aprovado";
-  const total = companyReceipts.reduce(
-    (sum, r) => sum + (r.amount ? parseFloat(r.amount) : 0),
-    0,
+  const totals = companyReceipts.reduce(
+    (acc, r) => {
+      const value = r.amount ? parseFloat(r.amount) : 0;
+      if (r.type === "venda") acc.vendas += value;
+      else acc.compras += value;
+      return acc;
+    },
+    { vendas: 0, compras: 0 },
   );
+  const saldo = totals.vendas - totals.compras;
 
   return (
     <div className="relative flex min-h-dvh flex-col pb-32">
@@ -65,15 +74,30 @@ export default async function RecibosPage() {
         )}
 
         {companyReceipts.length > 0 && (
-          <div className="mb-5 rounded-2xl border border-border bg-surface p-4 animate-fade-up">
-            <p className="text-[13px] text-muted-foreground">Total enviado</p>
-            <p className="mt-0.5 text-2xl font-semibold tracking-tight">
-              {formatCurrencyKz(total)}
-            </p>
-            <p className="mt-0.5 text-[13px] text-muted-foreground">
-              {companyReceipts.length}{" "}
-              {companyReceipts.length === 1 ? "recibo" : "recibos"}
-            </p>
+          <div className="mb-5 grid grid-cols-3 gap-2.5 animate-fade-up">
+            <div className="rounded-2xl border border-success/30 bg-success/10 p-3">
+              <p className="text-[11.5px] text-success/80">Vendas</p>
+              <p className="mt-0.5 truncate text-[15px] font-semibold text-success">
+                {formatCurrencyKz(totals.vendas)}
+              </p>
+            </div>
+            <div className="rounded-2xl border border-danger/30 bg-danger/10 p-3">
+              <p className="text-[11.5px] text-danger/80">Compras</p>
+              <p className="mt-0.5 truncate text-[15px] font-semibold text-danger">
+                {formatCurrencyKz(totals.compras)}
+              </p>
+            </div>
+            <div className="rounded-2xl border border-border bg-surface p-3">
+              <p className="text-[11.5px] text-muted-foreground">Saldo</p>
+              <p
+                className={clsx(
+                  "mt-0.5 truncate text-[15px] font-semibold",
+                  saldo >= 0 ? "text-success" : "text-danger",
+                )}
+              >
+                {formatCurrencyKz(saldo)}
+              </p>
+            </div>
           </div>
         )}
 
