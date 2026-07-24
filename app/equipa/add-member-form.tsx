@@ -27,7 +27,13 @@ export function AddMemberForm() {
       <form key={formKey} action={formAction} className="space-y-4">
         <div>
           <Label htmlFor="name">Nome</Label>
-          <Input id="name" name="name" placeholder="Nome do membro" required />
+          <Input
+            id="name"
+            name="name"
+            placeholder="Nome do membro"
+            required
+            disabled={pending}
+          />
           <FieldError>{state?.errors?.name?.[0]}</FieldError>
         </div>
         <div>
@@ -38,6 +44,7 @@ export function AddMemberForm() {
             type="email"
             placeholder="membro@exemplo.com"
             required
+            disabled={pending}
           />
           <FieldError>{state?.errors?.email?.[0]}</FieldError>
         </div>
@@ -49,6 +56,7 @@ export function AddMemberForm() {
             type="password"
             placeholder="Mínimo 6 caracteres"
             required
+            disabled={pending}
           />
           <FieldError>{state?.errors?.password?.[0]}</FieldError>
         </div>
@@ -58,7 +66,8 @@ export function AddMemberForm() {
             id="companyRole"
             name="companyRole"
             defaultValue="gestor"
-            className="h-13 w-full rounded-2xl border border-border bg-surface px-4 text-[16px] text-foreground outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary/15"
+            disabled={pending}
+            className="h-13 w-full rounded-2xl border border-border bg-surface px-4 text-[16px] text-foreground outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary/15 disabled:opacity-60"
           >
             <option value="gestor">Gestor — só pode enviar recibos</option>
             <option value="admin">Admin — também pode adicionar membros</option>

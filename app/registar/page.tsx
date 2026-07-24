@@ -43,24 +43,37 @@ export default function RegistarPage() {
                 type="text"
                 placeholder="Ex: Nawabus"
                 required
+                disabled={pending}
               />
               <FieldError>{state?.errors?.companyName?.[0]}</FieldError>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <Label htmlFor="nif">NIF</Label>
-                <Input id="nif" name="nif" type="text" required />
+                <Input id="nif" name="nif" type="text" required disabled={pending} />
                 <FieldError>{state?.errors?.nif?.[0]}</FieldError>
               </div>
               <div>
                 <Label htmlFor="contact">Contacto</Label>
-                <Input id="contact" name="contact" type="tel" required />
+                <Input
+                  id="contact"
+                  name="contact"
+                  type="tel"
+                  required
+                  disabled={pending}
+                />
                 <FieldError>{state?.errors?.contact?.[0]}</FieldError>
               </div>
             </div>
             <div>
               <Label htmlFor="address">Morada</Label>
-              <Input id="address" name="address" type="text" required />
+              <Input
+                id="address"
+                name="address"
+                type="text"
+                required
+                disabled={pending}
+              />
               <FieldError>{state?.errors?.address?.[0]}</FieldError>
             </div>
           </div>
@@ -78,6 +91,7 @@ export default function RegistarPage() {
                 autoComplete="name"
                 placeholder="O seu nome"
                 required
+                disabled={pending}
               />
               <FieldError>{state?.errors?.name?.[0]}</FieldError>
             </div>
@@ -90,6 +104,7 @@ export default function RegistarPage() {
                 autoComplete="email"
                 placeholder="voce@exemplo.com"
                 required
+                disabled={pending}
               />
               <FieldError>{state?.errors?.email?.[0]}</FieldError>
             </div>
@@ -102,6 +117,7 @@ export default function RegistarPage() {
                 autoComplete="new-password"
                 placeholder="Mínimo 6 caracteres"
                 required
+                disabled={pending}
               />
               <FieldError>{state?.errors?.password?.[0]}</FieldError>
             </div>

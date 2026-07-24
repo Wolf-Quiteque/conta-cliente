@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { LogOut, Users } from "lucide-react";
+import { Users } from "lucide-react";
 import { logout } from "@/app/actions/auth";
 import { StatusBadge, type UserStatus } from "@/components/ui/status-badge";
+import { LogoutButton } from "@/components/ui/logout-button";
 
 export function RecibosHeader({
   name,
@@ -33,13 +34,7 @@ export function RecibosHeader({
             <Users className="h-4 w-4" strokeWidth={2} />
           </Link>
           <form action={logout}>
-            <button
-              type="submit"
-              aria-label="Sair"
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-surface text-muted-foreground transition-colors hover:border-danger/40 hover:text-danger active:scale-95"
-            >
-              <LogOut className="h-4 w-4" strokeWidth={2} />
-            </button>
+            <LogoutButton />
           </form>
         </div>
       </div>
