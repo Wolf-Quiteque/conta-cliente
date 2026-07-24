@@ -1,58 +1,94 @@
 import Link from "next/link";
 import { clsx } from "clsx";
-import { desc, eq } from "drizzle-orm";
+import { count, desc, eq, sql } from "drizzle-orm";
 import { Plus, ReceiptText, TriangleAlert } from "lucide-react";
 import { db } from "@/lib/db/client";
 import { receipts, users } from "@/lib/db/schema";
 import { getCurrentUser } from "@/lib/auth/dal";
 import { RecibosHeader } from "@/components/receipts/recibos-header";
-import { ReceiptCard } from "@/components/receipts/receipt-card";
+import { ReceiptList } from "@/components/receipts/receipt-list";
 import { formatCurrencyKz } from "@/lib/format";
+import { RECEIPTS_PAGE_SIZE } from "@/lib/pagination";
 
 export const metadata = { title: "Os meus recibos" };
 
 export default async function RecibosPage() {
   const user = await getCurrentUser();
 
-  const companyReceipts = await db
-    .select({
-      id: receipts.id,
-      imageUrl: receipts.imageUrl,
-      amount: receipts.amount,
-      receiptDate: receipts.receiptDate,
-      note: receipts.note,
-      createdAt: receipts.createdAt,
-      type: receipts.type,
-      paymentMethod: receipts.paymentMethod,
-      uploaderId: users.id,
-      uploaderName: users.name,
-    })
-    .from(receipts)
-    .innerJoin(users, eq(users.id, receipts.userId))
-    .where(eq(receipts.companyId, user.companyId))
-    .orderBy(desc(receipts.createdAt));
+  const [stats, firstPage] = await Promise.all([
+    db
+      .select({
+        total: count(),
+        vendas: sql<string>`coalesce(sum(case when ${receipts.type} = 'venda' then ${receipts.amount} else 0 end), 0)`,
+        compras: sql<string>`coalesce(sum(case when ${receipts.type} = 'compra' then ${receipts.amount} else 0 end), 0)`,
+      })
+      .from(receipts)
+      .where(eq(receipts.companyId, user.companyId)),
+    db
+      .select({
+        id: receipts.id,
+        imageUrl: receipts.imageUrl,
+        amount: receipts.amount,
+        receiptDate: receipts.receiptDate,
+        note: receipts.note,
+        createdAt: receipts.createdAt,
+        type: receipts.type,
+        paymentMethod: receipts.paymentMethod,
+        uploaderId: users.id,
+        uploaderName: users.name,
+      })
+      .from(receipts)
+      .innerJoin(users, eq(users.id, receipts.userId))
+      .where(eq(receipts.companyId, user.companyId))
+      .orderBy(desc(receipts.createdAt), desc(receipts.id))
+      .limit(RECEIPTS_PAGE_SIZE),
+  ]);
 
+  const totalCount = stats[0]?.total ?? 0;
+  const vendas = parseFloat(stats[0]?.vendas ?? "0");
+  const compras = parseFloat(stats[0]?.compras ?? "0");
+  const saldo = vendas - compras;
   const canUpload = user.companyStatus === "aprovado";
-  const totals = companyReceipts.reduce(
-    (acc, r) => {
-      const value = r.amount ? parseFloat(r.amount) : 0;
-      if (r.type === "venda") acc.vendas += value;
-      else acc.compras += value;
-      return acc;
-    },
-    { vendas: 0, compras: 0 },
-  );
-  const saldo = totals.vendas - totals.compras;
 
   return (
-    <div className="relative flex min-h-dvh flex-col pb-32">
-      <RecibosHeader
-        name={user.name}
-        companyName={user.companyName}
-        status={user.companyStatus}
-      />
+    <div className="flex h-dvh flex-col overflow-hidden">
+      <div className="shrink-0 border-b border-border/60">
+        <RecibosHeader
+          name={user.name}
+          companyName={user.companyName}
+          status={user.companyStatus}
+        />
 
-      <main className="flex-1 px-5 pt-5">
+        {totalCount > 0 && (
+          <div className="grid grid-cols-3 gap-2.5 px-5 pb-4">
+            <div className="rounded-2xl border border-success/30 bg-success/10 p-3">
+              <p className="text-[11.5px] text-success/80">Vendas</p>
+              <p className="mt-0.5 truncate text-[15px] font-semibold text-success">
+                {formatCurrencyKz(vendas)}
+              </p>
+            </div>
+            <div className="rounded-2xl border border-danger/30 bg-danger/10 p-3">
+              <p className="text-[11.5px] text-danger/80">Compras</p>
+              <p className="mt-0.5 truncate text-[15px] font-semibold text-danger">
+                {formatCurrencyKz(compras)}
+              </p>
+            </div>
+            <div className="rounded-2xl border border-border bg-surface p-3">
+              <p className="text-[11.5px] text-muted-foreground">Saldo</p>
+              <p
+                className={clsx(
+                  "mt-0.5 truncate text-[15px] font-semibold",
+                  saldo >= 0 ? "text-success" : "text-danger",
+                )}
+              >
+                {formatCurrencyKz(saldo)}
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      <main className="flex-1 overflow-y-auto px-5 pb-32 pt-5">
         {user.companyStatus === "pendente" && (
           <div className="mb-5 flex items-start gap-3 rounded-2xl border border-warning/30 bg-warning/10 p-4 text-[13.5px] leading-relaxed text-foreground animate-fade-up">
             <TriangleAlert className="mt-0.5 h-4 w-4 shrink-0 text-warning" />
@@ -73,35 +109,7 @@ export default async function RecibosPage() {
           </div>
         )}
 
-        {companyReceipts.length > 0 && (
-          <div className="mb-5 grid grid-cols-3 gap-2.5 animate-fade-up">
-            <div className="rounded-2xl border border-success/30 bg-success/10 p-3">
-              <p className="text-[11.5px] text-success/80">Vendas</p>
-              <p className="mt-0.5 truncate text-[15px] font-semibold text-success">
-                {formatCurrencyKz(totals.vendas)}
-              </p>
-            </div>
-            <div className="rounded-2xl border border-danger/30 bg-danger/10 p-3">
-              <p className="text-[11.5px] text-danger/80">Compras</p>
-              <p className="mt-0.5 truncate text-[15px] font-semibold text-danger">
-                {formatCurrencyKz(totals.compras)}
-              </p>
-            </div>
-            <div className="rounded-2xl border border-border bg-surface p-3">
-              <p className="text-[11.5px] text-muted-foreground">Saldo</p>
-              <p
-                className={clsx(
-                  "mt-0.5 truncate text-[15px] font-semibold",
-                  saldo >= 0 ? "text-success" : "text-danger",
-                )}
-              >
-                {formatCurrencyKz(saldo)}
-              </p>
-            </div>
-          </div>
-        )}
-
-        {companyReceipts.length === 0 ? (
+        {totalCount === 0 ? (
           <div className="flex flex-col items-center justify-center gap-3 rounded-3xl border border-dashed border-border py-16 text-center animate-fade-up">
             <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-surface-2 text-muted-foreground">
               <ReceiptText className="h-6 w-6" />
@@ -115,21 +123,11 @@ export default async function RecibosPage() {
             </div>
           </div>
         ) : (
-          <ul className="space-y-2.5">
-            {companyReceipts.map((receipt) => (
-              <li key={receipt.id}>
-                <ReceiptCard
-                  receipt={{
-                    ...receipt,
-                    uploaderName:
-                      receipt.uploaderId === user.id
-                        ? undefined
-                        : receipt.uploaderName,
-                  }}
-                />
-              </li>
-            ))}
-          </ul>
+          <ReceiptList
+            initialReceipts={firstPage}
+            currentUserId={user.id}
+            totalCount={totalCount}
+          />
         )}
       </main>
 

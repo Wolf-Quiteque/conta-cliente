@@ -14,7 +14,7 @@ export function RecibosHeader({
   status: UserStatus;
 }) {
   return (
-    <header className="sticky top-0 z-20 border-b border-border/60 bg-background/80 px-5 pb-4 pt-[calc(env(safe-area-inset-top)+1.25rem)] backdrop-blur-xl">
+    <header className="bg-background px-5 pb-4 pt-[calc(env(safe-area-inset-top)+1.25rem)]">
       <div className="flex items-center justify-between gap-3">
         <div className="min-w-0">
           <p className="truncate text-[13px] text-muted-foreground">
