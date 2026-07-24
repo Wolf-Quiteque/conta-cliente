@@ -9,7 +9,7 @@ export const metadata = { title: "Novo recibo" };
 export default async function NovoReciboPage() {
   const user = await getCurrentUser();
 
-  if (user.status !== "aprovado") {
+  if (user.companyStatus !== "aprovado") {
     redirect("/recibos");
   }
 

@@ -1,8 +1,9 @@
 # NAWA Contas — Cliente
 
-App mobile-first onde os clientes fotografam e enviam os seus recibos (com
-valor e data opcionais quando a foto sai pouco nítida). As contas ficam
-pendentes até serem aprovadas no painel de administração (`conta-admin`).
+App mobile-first onde os membros de uma empresa fotografam e enviam os seus
+recibos (com valor e data opcionais quando a foto sai pouco nítida). Cada
+utilizador pertence a uma empresa; a empresa fica pendente até ser aprovada
+no painel de administração (`conta-admin`).
 
 ## Stack
 
@@ -56,12 +57,18 @@ pendentes até serem aprovadas no painel de administração (`conta-admin`).
 
 ## Fluxo
 
-1. O cliente regista-se (`/registar`) e fica com estado **pendente**.
-2. Um administrador aprova a conta em `conta-admin`.
-3. Só depois de **aprovado** o cliente consegue enviar recibos em `/recibos`.
+1. Em `/registar` cria-se uma empresa (nome, NIF, morada, contacto) e o
+   primeiro utilizador fica como **dono/admin** dessa empresa. A empresa
+   fica com estado **pendente**.
+2. Um administrador da plataforma aprova a empresa em `conta-admin`.
+3. Só depois de **aprovada** os membros conseguem enviar recibos em
+   `/recibos` (partilhado por toda a empresa).
 4. Cada envio: foto é redimensionada e convertida para WebP no browser,
    enviada diretamente para o Vercel Blob, e o registo (valor/data/nota) é
-   guardado na base de dados.
+   guardado na base de dados, associado à empresa e a quem o enviou.
+5. Em `/equipa`, membros com função **Admin** podem adicionar novos membros
+   (nome, email, palavra-passe inicial, função Admin/Gestor). Membros
+   **Gestor** só podem enviar recibos.
 
 ## Deploy
 

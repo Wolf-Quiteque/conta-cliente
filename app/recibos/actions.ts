@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { eq } from "drizzle-orm";
 import { db } from "@/lib/db/client";
-import { receipts, users } from "@/lib/db/schema";
+import { companies, receipts, users } from "@/lib/db/schema";
 import { verifySession } from "@/lib/auth/dal";
 
 export type CreateReceiptInput = {
@@ -17,18 +17,20 @@ export type CreateReceiptInput = {
 export async function createReceipt(input: CreateReceiptInput) {
   const session = await verifySession();
 
-  const [user] = await db
-    .select({ status: users.status })
+  const [row] = await db
+    .select({ companyId: users.companyId, companyStatus: companies.status })
     .from(users)
+    .innerJoin(companies, eq(companies.id, users.companyId))
     .where(eq(users.id, session.userId))
     .limit(1);
 
-  if (!user || user.status !== "aprovado") {
-    throw new Error("A sua conta ainda não foi aprovada para enviar recibos.");
+  if (!row || row.companyStatus !== "aprovado") {
+    throw new Error("A empresa ainda não foi aprovada para enviar recibos.");
   }
 
   await db.insert(receipts).values({
     userId: session.userId,
+    companyId: row.companyId!,
     imageUrl: input.imageUrl,
     imagePathname: input.imagePathname,
     amount: input.amount,

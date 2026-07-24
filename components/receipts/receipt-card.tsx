@@ -11,6 +11,7 @@ export function ReceiptCard({
     receiptDate: string | null;
     createdAt: Date | string;
     note: string | null;
+    uploaderName?: string;
   };
 }) {
   return (
@@ -30,9 +31,16 @@ export function ReceiptCard({
         />
       </div>
       <div className="flex min-w-0 flex-1 flex-col justify-center gap-0.5">
-        <span className="truncate text-[15px] font-medium">
-          {formatCurrencyKz(receipt.amount)}
-        </span>
+        <div className="flex items-center justify-between gap-2">
+          <span className="truncate text-[15px] font-medium">
+            {formatCurrencyKz(receipt.amount)}
+          </span>
+          {receipt.uploaderName && (
+            <span className="shrink-0 truncate rounded-full bg-surface-2 px-2 py-0.5 text-[11px] text-muted-foreground">
+              {receipt.uploaderName}
+            </span>
+          )}
+        </div>
         <span className="text-[13px] text-muted-foreground">
           {formatDate(receipt.receiptDate ?? receipt.createdAt)}
         </span>
