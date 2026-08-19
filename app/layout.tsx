@@ -14,10 +14,11 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    template: "%s · NAWA Contas",
-    default: "NAWA Contas",
+    template: "%s · Contiks Digital",
+    default: "Contiks Digital",
   },
-  description: "Envie os seus recibos em segundos.",
+  description:
+    "Consultoria em contabilidade, fiscalidade e recursos humanos para empresas em Angola.",
 };
 
 export const viewport: Viewport = {
@@ -26,8 +27,8 @@ export const viewport: Viewport = {
   maximumScale: 1,
   viewportFit: "cover",
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#fbf4ec" },
-    { media: "(prefers-color-scheme: dark)", color: "#150f0b" },
+    { media: "(prefers-color-scheme: light)", color: "#f8fbf8" },
+    { media: "(prefers-color-scheme: dark)", color: "#0b3822" },
   ],
 };
 

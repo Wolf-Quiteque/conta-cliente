@@ -10,9 +10,7 @@ export async function proxy(req: NextRequest) {
   const isAuthenticated = Boolean(session?.userId);
 
   if (pathname === "/") {
-    return NextResponse.redirect(
-      new URL(isAuthenticated ? "/recibos" : "/entrar", req.url),
-    );
+    return NextResponse.next();
   }
 
   const isPublicRoute = publicRoutes.includes(pathname);
