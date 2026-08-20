@@ -57,13 +57,6 @@ const services = [
   },
 ];
 
-const pricing = [
-  { volume: "200.000 — 500.000 Kz", price: "45.000 Kz" },
-  { volume: "501.000 — 1.000.000 Kz", price: "80.000 Kz" },
-  { volume: "1.001.000 — 1.500.000 Kz", price: "150.000 Kz" },
-  { volume: "1.501.000 — 2.000.000 Kz", price: "200.000 Kz" },
-];
-
 export default function Home() {
   return (
     <main className="min-h-screen overflow-hidden bg-[#f8fbf8] text-[#10291d]">
@@ -107,12 +100,6 @@ export default function Home() {
                 className="transition-colors hover:text-[#07833b]"
               >
                 Como funciona
-              </a>
-              <a
-                href="#precos"
-                className="transition-colors hover:text-[#07833b]"
-              >
-                Preços
               </a>
               <a
                 href="#sobre"
@@ -497,82 +484,6 @@ export default function Home() {
                 </p>
               </article>
             ))}
-          </div>
-        </div>
-      </section>
-
-      <section
-        id="precos"
-        className="scroll-mt-20 px-5 py-24 sm:px-8 lg:px-10 lg:py-32"
-      >
-        <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-[0.78fr_1.22fr] lg:items-center">
-          <div>
-            <p className="text-sm font-bold uppercase tracking-[0.18em] text-[#e98118]">
-              Investimento transparente
-            </p>
-            <h2 className="mt-4 text-4xl font-semibold tracking-[-0.045em] text-[#0e2f1e] sm:text-5xl">
-              Um plano à medida do seu volume.
-            </h2>
-            <p className="mt-6 text-lg leading-8 text-[#60766a]">
-              O pacote de contabilidade e fiscalidade acompanha o crescimento
-              da sua empresa. Comece com o nível certo e evolua quando precisar.
-            </p>
-            <div className="mt-8 inline-flex items-center gap-3 rounded-2xl bg-[#eaf7ee] px-4 py-3 text-sm font-semibold text-[#176538]">
-              <ShieldCheck className="h-5 w-5" />
-              Retenção aplicável incluída no enquadramento
-            </div>
-          </div>
-
-          <div className="overflow-hidden rounded-[2rem] border border-[#dce9df] bg-white shadow-[0_24px_70px_rgba(26,83,49,0.09)]">
-            <div className="flex items-center justify-between gap-4 bg-[#087c39] px-6 py-5 text-white sm:px-8">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-white/60">
-                  Pacote mensal
-                </p>
-                <p className="mt-1 text-xl font-bold">
-                  Contabilidade e fiscalidade
-                </p>
-              </div>
-              <ReceiptText className="h-7 w-7 text-[#93e5ad]" />
-            </div>
-            <div className="divide-y divide-[#e4eee7]">
-              <div className="grid grid-cols-[1fr_auto] gap-4 bg-[#f5faf7] px-6 py-3 text-[11px] font-bold uppercase tracking-[0.13em] text-[#7a8f82] sm:px-8">
-                <span>Volume mensal</span>
-                <span>Honorário</span>
-              </div>
-              {pricing.map(({ volume, price }) => (
-                <div
-                  key={volume}
-                  className="grid grid-cols-[1fr_auto] items-center gap-4 px-6 py-5 transition-colors hover:bg-[#f8fcf9] sm:px-8"
-                >
-                  <span className="text-sm font-medium text-[#536c5e] sm:text-base">
-                    {volume}
-                  </span>
-                  <span className="text-base font-bold text-[#0c7c39] sm:text-lg">
-                    {price}
-                  </span>
-                </div>
-              ))}
-              <div className="grid grid-cols-[1fr_auto] items-center gap-4 bg-[#fff9f1] px-6 py-5 sm:px-8">
-                <div>
-                  <p className="text-sm font-bold text-[#49331f] sm:text-base">
-                    Acima de 2.001.000 Kz
-                  </p>
-                  <p className="mt-1 text-xs text-[#806b58]">
-                    Valor final ajustado ao volume e complexidade
-                  </p>
-                </div>
-                <span className="text-right text-sm font-bold text-[#e17a13] sm:text-base">
-                  Desde 375.000 Kz
-                </span>
-              </div>
-            </div>
-            <div className="border-t border-[#e4eee7] px-6 py-4 sm:px-8">
-              <p className="text-xs leading-5 text-[#829087]">
-                Valores indicativos. O enquadramento final é confirmado após
-                análise da atividade e das necessidades da empresa.
-              </p>
-            </div>
           </div>
         </div>
       </section>
